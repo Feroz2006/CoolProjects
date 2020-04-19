@@ -1,4 +1,4 @@
-# Program checks the validity of a password
+# Program checks the validity of a password, i.e password should be minimum 8 characters long and can contain any character.
 
 import re
 
