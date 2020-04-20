@@ -1,3 +1,6 @@
+# Program to send emails 
+# This program does not work unless you allow your email ID to use less 'secure' apps like the code editor or IDE you are using
+
 import smtplib
 
 from email.message import EmailMessage
