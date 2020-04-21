@@ -1,4 +1,4 @@
-# This program checks if your password has ever been hackes or not
+# This program checks if your password has ever been hacked or not
 # To use this program run it on the terminal and enter the passwords you want to check next to it before you run it.
 # for example : python PasswordChecker.py (password) (password) (password) (etc...)
 
