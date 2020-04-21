@@ -1,17 +1,42 @@
-# Program checks the validity of a password, i.e password should be minimum 8 characters long and can contain any character.
+# This program checks if your password has ever been hackes or not
+# To use this program run it on the terminal and enter the passwords you want to check next to it before you run it.
+# for example : python PasswordChecker.py (password) (password) (password) (etc...)
 
-import re
+import requests
+import hashlib
+import sys
 
-valid_password = r"[a-zA-Z0-9]{7,}[^abc]"
-password_forvalidation = input("Enter your password (min: 8 characters:")
 
-matches = re.finditer(valid_password, password_forvalidation, re.MULTILINE)
+def request_api_data(query_char):
+    url = "https://api.pwnedpasswords.com/range/" + query_char
+    res = requests.get(url)
+    if res.status_code != 200:
+        raise RuntimeError(f"Error fetching: {res.status_code}, check the API and try again ")
+    return res
 
-for matchNum, match in enumerate(matches, start=1):
-    print("This password is valid ")
-    print(f"This character has {match.end()} characters")
-    print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
-    
-    for groupNum in range(0, len(match.groups())):
-        groupNum = groupNum + 1
-        print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
+
+def get_password_leaks_count(hashes, hash_to_check):
+    hashes = (line.split(":") for line in hashes.text.splitlines())
+    for h, count in hashes:
+        if h == hash_to_check:
+            return count
+    return 0
+
+
+def pwned_api_check(password):
+    sha1_password = (hashlib.sha1(password.encode("utf-8")).hexdigest().upper())
+    first5_char, tail = sha1_password[:5], sha1_password[5:]
+    response = request_api_data(first5_char)
+    return get_password_leaks_count(response, tail)
+
+def main(args):
+    for password in args:
+        count = pwned_api_check(password)
+        if count:
+            print(f"The password was found {count} times ... you should change your password")
+        else:
+            print(f"The password was not found. Carry on !")
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
